@@ -53,12 +53,10 @@ class PageModel extends BaseModel
       $meta->add('sort', (int) $this->model->num());
       $meta->add('home', $this->model->isHomePage());
     }
-    if ($this->lang !== null) {
-      $meta->add('lang', $this->lang);
-    }
     $meta->add('modified',  date('c', $this->model->modified()));
-
     if (ConfigHelper::isMultilang()) {
+      $meta->add('lang', $this->lang);
+      $meta->add('locale', LanguagesHelper::getLocale($this->lang));
       $node = new Collection();
       foreach (LanguagesHelper::list() as $code => $data) {
         $node->add($code, KirbyHelper::getNodeUrl($this->model, $code));
