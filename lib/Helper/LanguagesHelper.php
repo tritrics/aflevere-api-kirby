@@ -3,6 +3,7 @@
 namespace Tritrics\Ahoi\v1\Helper;
 
 use Kirby\Cms\Language;
+use Kirby\Cms\Languages;
 use Kirby\Exception\LogicException;
 use Tritrics\Ahoi\v1\Data\Collection;
 
@@ -19,7 +20,31 @@ class LanguagesHelper
     if (!ConfigHelper::isMultilang()) {
       return 0;
     }
-    return KirbyHelper::getLanguages()->count();
+    return self::getAll()->count();
+  }
+
+  /**
+   * Get a single language as Kirby object defined by $code.
+   */
+  public static function get(?string $code): ?Language
+  {
+    try {
+      return kirby()->language($code);
+    } catch (LogicException $E) {
+      return null;
+    }
+  }
+
+  /**
+   * Get all languages as Kirby object.
+   */
+  public static function getAll(): ?Languages
+  {
+    try {
+      return kirby()->languages();
+    } catch (LogicException $E) {
+      return null;
+    }
   }
 
   /**
@@ -30,7 +55,7 @@ class LanguagesHelper
     if (!ConfigHelper::isMultilang()) {
       return null;
     }
-    return KirbyHelper::getLanguages()->default();
+    return self::getAll()->default();
   }
 
   /**
@@ -41,7 +66,7 @@ class LanguagesHelper
     if (!self::isValid($code)) {
       return '';
     }
-    $language = KirbyHelper::getLanguage($code);
+    $language = self::get($code);
     $php_locale = $language->locale(LC_ALL);
     return str_replace('_', '-', $php_locale);
   }
@@ -57,7 +82,7 @@ class LanguagesHelper
     if (!self::isValid($code)) {
       return '';
     }
-    $language = KirbyHelper::getLanguage($code);
+    $language = self::get($code);
     $url = parse_url($language->url());
     if ($language->isDefault() && (!isset($url['path']) || $url['path'] === '')) {
       return '';
@@ -84,7 +109,7 @@ class LanguagesHelper
     if (!$code && !ConfigHelper::isMultilang()) {
       return true;
     }
-    return KirbyHelper::getLanguages()->has($code);
+    return self::getAll()->has($code);
   }
 
   /**
@@ -94,7 +119,7 @@ class LanguagesHelper
   {
     $home = kirby()->site()->homePage();
     $res = new Collection();
-    foreach (KirbyHelper::getLanguages() as $language) {
+    foreach (self::getAll() as $language) {
       $res->add($language->code(), [
         'name' => $language->name(),
         'slug' => self::getSlug($language->code()),

@@ -7,9 +7,6 @@ use Kirby\Cms\File;
 use Kirby\Cms\Page;
 use Kirby\Cms\Site;
 use Kirby\Cms\Pages;
-use Kirby\Cms\Language;
-use Kirby\Cms\Languages;
-use Kirby\Exception\LogicException;
 use Throwable;
 
 /**
@@ -187,29 +184,5 @@ class KirbyHelper
       return '/' . ltrim($parent->uri($lang), '/');
     }
     return '/';
-  }
-
-  /**
-   * Get a single language as Kirby object defined by $code.
-   */
-  public static function getLanguage(?string $code): ?Language
-  {
-    try {
-      return kirby()->language($code);
-    } catch (LogicException $E) {
-      return null;
-    }
-  }
-
-  /**
-   * Get all languages as Kirby object.
-   */
-  public static function getLanguages(): ?Languages
-  {
-    try {
-      return kirby()->languages();
-    } catch (LogicException $E) {
-      return null;
-    }
   }
 }

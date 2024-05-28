@@ -6,7 +6,7 @@ use Kirby\Exception\DuplicateException;
 use Kirby\Exception\LogicException;
 use Tritrics\Ahoi\v1\Data\Collection;
 use Tritrics\Ahoi\v1\Helper\ConfigHelper;
-use Tritrics\Ahoi\v1\Helper\KirbyHelper;
+use Tritrics\Ahoi\v1\Helper\LanguagesHelper;
 use Tritrics\Ahoi\v1\Models\LanguageModel;
 
 /**
@@ -69,7 +69,7 @@ class InfoService
     // add languages
     if ($isMultilang) {
       $languages = $body->add('languages');
-      foreach(KirbyHelper::getLanguages() as $model) {
+      foreach(LanguagesHelper::getAll() as $model) {
         $languages->push(new LanguageModel($model));
       }
     }
