@@ -122,7 +122,7 @@ class BlueprintHelper
       $add_title_field = true;
     } elseif ($model instanceof Site) {
       $path = 'site';
-      $add_title_field = false;
+      $add_title_field = true;
     } elseif ($model instanceof File) {
       $path = 'files/' . $model->template();
       $add_title_field = false;
@@ -161,6 +161,7 @@ class BlueprintHelper
         'required' => true,
       ];
     }
+    
     $fields = array_merge($fields, self::getFieldsFromSectionsRec($blueprint, $publish));
     $res->add('fields', $fields);
     return $res;
@@ -211,6 +212,12 @@ class BlueprintHelper
             $res = array_merge($res, self::getFieldsRec($section['fields'], $publish));
           }
         }
+      }
+
+      // fields
+      // (may be in /files-blueprint)
+      else if ($key === 'fields') {
+        $res = array_merge($res, self::getFieldsRec($node, $publish));
       }
       
       // dig deeper

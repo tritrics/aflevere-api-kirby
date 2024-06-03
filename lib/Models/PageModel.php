@@ -38,38 +38,46 @@ class PageModel extends BaseModel
 
     $meta = $res->add('meta');
     if ($this->model instanceof Page) {
-      $meta->add('id', $this->model->id());
+      // $meta->add('id', $this->model->id()); not needed
       $meta->add('slug', $this->model->slug($this->lang));
       $meta->add('href', $attr['href']);
-      $meta->add('parent', KirbyHelper::getParentUrl($this->model, $this->lang));
-      $meta->add('blueprint', (string) $this->model->intendedTemplate());
     } else {
-      $meta->add('host', $this->model->url($this->lang));
-      $meta->add('blueprint', 'site');
+      $meta->add('href', $attr['href']);
     }
-    $meta->add('title', $content->title()->value());
+    $meta->add('node', '/' . trim($this->lang . '/' . $this->model->uri($this->lang), '/'));
     if ($this->model instanceof Page) {
+      $meta->add('blueprint', (string) $this->model->intendedTemplate());
       $meta->add('status', $this->model->status());
       $meta->add('sort', (int) $this->model->num());
       $meta->add('home', $this->model->isHomePage());
+    } else {
+      $meta->add('blueprint', 'site');
     }
+    $meta->add('title', $content->title()->value());
     $meta->add('modified',  date('c', $this->model->modified()));
     if (ConfigHelper::isMultilang()) {
       $meta->add('lang', $this->lang);
       $meta->add('locale', LanguagesHelper::getLocale($this->lang));
-      $node = new Collection();
-      foreach (LanguagesHelper::list() as $code => $data) {
-        $node->add($code, KirbyHelper::getNodeUrl($this->model, $code));
+      if ($this->addDetails) {
+        $translations = new Collection();
+        foreach (LanguagesHelper::getCodes() as $code) {
+          $attr = LinkHelper::get($this->model, null, false, $code, 'page');
+          $translations->add($code, [
+            'href' => $attr['href'],
+            'node' => '/' . trim($code . '/' . $this->model->uri($code), '/')
+          ]);
+        }
+        $meta->add('translations', $translations);
       }
-    } else {
-      $node = KirbyHelper::getNodeUrl($this->model, $this->lang);
     }
-    $meta->add('node', $node);
     
     if ($this->blueprint->has('api', 'meta')) {
-      $api = $meta->add('api');
+      $api = new Collection();
       foreach ($this->blueprint->node('api', 'meta')->get() as $key => $value) {
         $api->add($key, $value);
+      }
+      if ($api->count() > 0) {
+        $meta->add('api', $api);
       }
     }
     return $res;

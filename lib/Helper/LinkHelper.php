@@ -100,7 +100,7 @@ class LinkHelper
   {
     if (is_string($mixed)) {
       $file = KirbyHelper::findFileByKirbyLink($mixed);
-    } else if ($mixed instanceof Page) {
+    } else if ($mixed instanceof File) {
       $file = $mixed;
     } else {
       $file = null;

@@ -2,8 +2,7 @@
 
 namespace Tritrics\Ahoi\v1\Helper;
 
-use Kirby\Cms\Page;
-use Kirby\Cms\Site;
+use Kirby\Http\Url;
 
 class UrlHelper
 {
@@ -43,18 +42,28 @@ class UrlHelper
   }
 
   /**
-   * Check if an url begins with backend and/or frontend host
+   * Get Client IP
    */
-  public static function compareHosts(array $parts, array $compare): bool
+  public static function getClientIp(): string
   {
-    $host = isset($parts['host']) ? $parts['host'] : null;
-    $hostCompare = isset($compare['host']) ? $compare['host'] : null;
-    if ($host !== $hostCompare) {
-      return false;
-    }
-    $port = isset($parts['port']) ? $parts['port'] : null;
-    $portCompare = isset($compare['port']) ? $compare['port'] : null;
-    return $port === $portCompare;
+    return getenv('HTTP_CLIENT_IP') ? getenv('HTTP_CLIENT_IP') : getenv('REMOTE_ADDR'); // don't care about proxys, too complicated for our purpose
+  }
+
+  /**
+   * Get url of referer/frontend.
+   */
+  public static function getReferer(): string
+  {
+    return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : self::getSelfUrl();
+  }
+
+  /**
+   * Get url of backend.
+   */
+  public static function getSelfUrl(): string
+  {
+    $backend = self::parse(URL::current());
+    return self::buildHost($backend);
   }
 
   /**

@@ -7,6 +7,7 @@ use Tritrics\Ahoi\v1\Helper\KirbyHelper;
 use Tritrics\Ahoi\v1\Helper\UrlHelper;
 use Tritrics\Ahoi\v1\Helper\ConfigHelper;
 use Tritrics\Ahoi\v1\Helper\LanguagesHelper;
+use Tritrics\Ahoi\v1\Helper\LinkHelper;
 
 /**
  * Model for Kirby's file object
@@ -32,6 +33,7 @@ class FileModel extends BaseModel
   protected function getProperties (): Collection
   {
     $parts = UrlHelper::parse($this->model->url());
+    $page = $this->model->parent($this->lang);
 
     $meta = new Collection();
     $meta->add('host', UrlHelper::buildHost($parts));
@@ -40,12 +42,10 @@ class FileModel extends BaseModel
     $meta->add('name', $parts['filename']);
     $meta->add('ext', $parts['extension']);
     $meta->add('href', $this->model->url());
+    $meta->add('node', '/' . ltrim($this->lang . '/' . $page->uri($this->lang), '/') . '/' . $this->model->filename());
     $meta->add('filetype', $this->model->type());
     $meta->add('blueprint', $this->model->template());
     $meta->add('title', $parts['filename']);
-    if ($this->lang !== null) {
-      $meta->add('lang', $this->lang);
-    }
     $meta->add('modified',  date('c', $this->model->modified()));
     if ($this->model->type() === 'image') {
       $meta->add('width', $this->model->width());
@@ -53,14 +53,19 @@ class FileModel extends BaseModel
     }
 
     if (ConfigHelper::isMultilang()) {
-      $node = new Collection();
-      foreach (LanguagesHelper::list() as $code => $data) {
-        $node->add($code, KirbyHelper::getNodeUrl($this->model, $code));
+      $meta->add('lang', $this->lang);
+      if ($this->addDetails) {
+        $translations = new Collection();
+        foreach (LanguagesHelper::getCodes() as $code) {
+          $attr = LinkHelper::get($this->model, null, false, $code, 'file');
+          $translations->add($code, [
+            'href' => $attr['href'],
+            'node' => '/' . ltrim($code . '/' . $page->uri($code), '/') . '/' . $this->model->filename()
+          ]);
+        }
+        $meta->add('translations', $translations);
       }
-    } else {
-      $node = KirbyHelper::getNodeUrl($this->model, $this->lang);
     }
-    $meta->add('node', $node);
 
     $res = new Collection();
     $res->add('meta', $meta);

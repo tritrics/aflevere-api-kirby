@@ -44,11 +44,11 @@ class Response {
       'msg' => $this->msg,
       'request' => $this->request,
     ];
+    if (is_string($this->node) && !empty($this->node)) {
+      $data['node'] = '/' . ltrim($this->lang . '/' . $this->node, '/');
+    }
     if (is_string($this->lang) && !empty($this->lang)) {
       $data['lang'] = $this->lang;
-    }
-    if (is_string($this->node) && !empty($this->node)) {
-      $data['node'] = $this->node;
     }
     if (is_string($this->query) && !empty($this->query)) {
       $data['query'] = urldecode($this->query);

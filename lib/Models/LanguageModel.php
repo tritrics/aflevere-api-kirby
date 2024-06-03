@@ -23,6 +23,8 @@ class LanguageModel extends BaseModel
     $meta->add('code', $code);
     $meta->add('title', $this->model->name());
     $meta->add('default', $this->model->isDefault());
+    $meta->add('origin', LanguagesHelper::getOrigin($code));
+    $meta->add('href', LanguagesHelper::getHref($code));
     $meta->add('locale', LanguagesHelper::getLocale($code));
     $meta->add('direction', $this->model->direction());
     return $res;

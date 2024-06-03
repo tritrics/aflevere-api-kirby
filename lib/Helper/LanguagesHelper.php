@@ -13,6 +13,11 @@ use Tritrics\Ahoi\v1\Data\Collection;
 class LanguagesHelper
 {
   /**
+   * Cache some data.
+   */
+  private static $cache = [];
+
+  /**
    * Get the language count if it's a multilang installation.
    */
   public static function count(): int
@@ -48,6 +53,18 @@ class LanguagesHelper
   }
 
   /**
+   * List availabe languages for intern use.
+   */
+  public static function getCodes(): array
+  {
+    $res = [];
+    foreach (self::getAll() as $language) {
+      $res[] = $language->code();
+    }
+    return $res;
+  }
+
+  /**
    * Get the default language as Kirby object.
    */
   public static function getDefault(): ?Language
@@ -72,30 +89,35 @@ class LanguagesHelper
   }
 
   /**
-   * Get the slug for a given language.
-   * setting url = '/' means there is no prefix for default langauge
-   * Frontend has it's own logic and always uses code for api-requests.
-   * The slug-property is only the vue-router to show or not the code in routes.
+   * Get the origin for a given language. Can be set in
+   * url in language config or empty (= no specific origin).
    */
-  public static function getSlug(?string $code): string
+  public static function getOrigin(string $code): string
   {
     if (!self::isValid($code)) {
       return '';
     }
     $language = self::get($code);
-    $url = parse_url($language->url());
-    if ($language->isDefault() && (!isset($url['path']) || $url['path'] === '')) {
+    $url = UrlHelper::parse($language->url());
+    $urlHost = UrlHelper::buildHost($url);
+    $self = UrlHelper::getSelfUrl();
+    if ($self === $urlHost) {
       return '';
     }
-    return $language->code();
+    return rtrim(UrlHelper::buildHost($url), '/');
   }
 
   /**
-   * Get the url for a given language.
+   * Get the link part of a given language.
    */
-  public static function getUrl(string $code, string $slug): string
+  public static function getHref(string $code): string
   {
-    return '/' . trim(self::getSlug($code) . '/' . $slug, '/');
+    if (!self::isValid($code)) {
+      return '';
+    }
+    $language = self::get($code);
+    $url = UrlHelper::parse($language->url());
+    return rtrim(UrlHelper::buildPath($url), '/');
   }
 
   /**
@@ -110,25 +132,5 @@ class LanguagesHelper
       return true;
     }
     return self::getAll()->has($code);
-  }
-
-  /**
-   * List availabe languages for intern use.
-   */
-  public static function list(): Collection
-  {
-    $home = kirby()->site()->homePage();
-    $res = new Collection();
-    foreach (self::getAll() as $language) {
-      $res->add($language->code(), [
-        'name' => $language->name(),
-        'slug' => self::getSlug($language->code()),
-        'default' => $language->isDefault(),
-        'locale' => self::getLocale($language->code()),
-        'direction' => $language->direction(),
-        'homeslug' => $home->uri($language->code())
-      ]);
-    }
-    return $res;
   }
 }

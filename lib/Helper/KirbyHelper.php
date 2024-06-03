@@ -159,30 +159,4 @@ class KirbyHelper
     }
     return null;
   }
-
-  /**
-   * Get url of a model.
-   * Dont't add langslug!
-   */
-  public static function getNodeUrl(Page|Site|File $model, ?string $lang): string
-  {
-    if ($model instanceof File) {
-      $parentUrl = self::getParentUrl($model, $lang);
-      return rtrim($parentUrl, '/') . '/' . $model->filename();
-    }
-    return '/' . ltrim($model->uri($lang), '/');
-  }
-
-  /**
-   * Get url of parent model.
-   * Dont't add langslug!
-   */
-  public static function getParentUrl(Page|Site|File $model, ?string $lang): string
-  {
-    $parent = $model->parent();
-    if ($parent) {
-      return '/' . ltrim($parent->uri($lang), '/');
-    }
-    return '/';
-  }
 }

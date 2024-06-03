@@ -26,9 +26,9 @@ class FieldsService
   {
     $blueprint = BlueprintHelper::get($model);
     if($model instanceof File) {
-      $body = new FileModel($model, $blueprint, $lang);
+      $body = new FileModel($model, $blueprint, $lang, $fields, true);
     } else {
-      $body = new PageModel($model, $blueprint, $lang, $fields);
+      $body = new PageModel($model, $blueprint, $lang, $fields, true);
     }
     return $body;
   }
