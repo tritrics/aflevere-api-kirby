@@ -144,7 +144,6 @@ class TextModel extends BaseModel
 
   /**
    * Get type of this model as it's returned in response.
-   * Method called by setModelData()
    */
   protected function getType (): string
   {

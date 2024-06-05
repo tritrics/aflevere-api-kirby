@@ -76,6 +76,22 @@ class LanguagesHelper
   }
 
   /**
+   * Get link (optional) prefix, defined in languages/[lang].php > url.
+   * Link prefix is the path-part of the setting (@see getOrigin()).
+   * Default link prefix is the language-code.
+   */
+  public static function getLangSlug(string $code): string|null
+  {
+    if (self::isValid($code)) {
+      $language = self::get($code);
+      $url = UrlHelper::parse($language->url());
+      $path = UrlHelper::buildPath($url);
+      return $path === '/' ? '' : $path;
+    }
+    return null;
+  }
+
+  /**
    * Get the locale for a given language.
    */
   public static function getLocale(?string $code): string
@@ -89,35 +105,21 @@ class LanguagesHelper
   }
 
   /**
-   * Get the origin for a given language. Can be set in
-   * url in language config or empty (= no specific origin).
+   * Get the (optional) domain, defined in languages/[lang].php > url.
+   * Origin is the domain-part of the setting (@see getLinkPrefix()).
    */
-  public static function getOrigin(string $code): string
+  public static function getOrigin(string $code): string|null
   {
-    if (!self::isValid($code)) {
-      return '';
+    if (self::isValid($code)) {
+      $language = self::get($code);
+      $url = UrlHelper::parse($language->url());
+      $urlHost = UrlHelper::buildHost($url);
+      $self = UrlHelper::getSelfUrl();
+      if ($self !== $urlHost) {
+        return rtrim(UrlHelper::buildHost($url), '/');
+      }
     }
-    $language = self::get($code);
-    $url = UrlHelper::parse($language->url());
-    $urlHost = UrlHelper::buildHost($url);
-    $self = UrlHelper::getSelfUrl();
-    if ($self === $urlHost) {
-      return '';
-    }
-    return rtrim(UrlHelper::buildHost($url), '/');
-  }
-
-  /**
-   * Get the link part of a given language.
-   */
-  public static function getHref(string $code): string
-  {
-    if (!self::isValid($code)) {
-      return '';
-    }
-    $language = self::get($code);
-    $url = UrlHelper::parse($language->url());
-    return rtrim(UrlHelper::buildPath($url), '/');
+    return null;
   }
 
   /**
@@ -128,9 +130,9 @@ class LanguagesHelper
    */
   public static function isValid(?string $code): bool
   {
-    if (!$code && !ConfigHelper::isMultilang()) {
-      return true;
+    if (ConfigHelper::isMultilang()) {
+      return self::getAll()->has($code);
     }
-    return self::getAll()->has($code);
+    return empty($code) || $code === null;
   }
 }

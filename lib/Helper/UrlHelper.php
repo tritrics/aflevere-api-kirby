@@ -3,6 +3,8 @@
 namespace Tritrics\Ahoi\v1\Helper;
 
 use Kirby\Http\Url;
+use Kirby\Cms\File;
+use Kirby\Cms\Page;
 
 class UrlHelper
 {
@@ -47,6 +49,38 @@ class UrlHelper
   public static function getClientIp(): string
   {
     return getenv('HTTP_CLIENT_IP') ? getenv('HTTP_CLIENT_IP') : getenv('REMOTE_ADDR'); // don't care about proxys, too complicated for our purpose
+  }
+
+  /**
+   * Get host from an url.
+   */
+  public static function getHost(string $url): string
+  {
+    $parts = self::parse($url);
+    return self::buildHost($parts);
+  }
+
+  /**
+   * Get node for a page or file.
+   */
+  public static function getNode(Page|File $model, ?string $lang): string
+  {
+    if ($model instanceof Page) {
+      return '/' . trim($lang . '/' . $model->uri($lang), '/');
+    }
+    if ($model instanceof File) {
+      $page = $model->parent($lang);
+      return '/' . ltrim($lang . '/' . $page->uri($lang), '/') . '/' . $model->filename();
+    }
+  }
+
+  /**
+   * Get path of an url.
+   */
+  public static function getPath(string $url): string
+  {
+    $parts = self::parse($url);
+    return self::buildPath($parts);
   }
 
   /**

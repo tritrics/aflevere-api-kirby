@@ -28,7 +28,6 @@ class FileModel extends BaseModel
 
   /**
    * Get additional field data (besides type and value)
-   * Method called by setModelData()
    */
   protected function getProperties (): Collection
   {
@@ -42,7 +41,10 @@ class FileModel extends BaseModel
     $meta->add('name', $parts['filename']);
     $meta->add('ext', $parts['extension']);
     $meta->add('href', $this->model->url());
-    $meta->add('node', '/' . ltrim($this->lang . '/' . $page->uri($this->lang), '/') . '/' . $this->model->filename());
+    $meta->add('node', UrlHelper::getNode($this->model, $this->lang));
+    if (ConfigHelper::isMultilang()) {
+      $meta->add('lang', $this->lang);
+    }
     $meta->add('filetype', $this->model->type());
     $meta->add('blueprint', $this->model->template());
     $meta->add('title', $parts['filename']);
@@ -52,13 +54,14 @@ class FileModel extends BaseModel
       $meta->add('height', $this->model->height());
     }
 
+    // adding translations
     if (ConfigHelper::isMultilang()) {
-      $meta->add('lang', $this->lang);
       if ($this->addDetails) {
         $translations = new Collection();
         foreach (LanguagesHelper::getCodes() as $code) {
           $attr = LinkHelper::get($this->model, null, false, $code, 'file');
-          $translations->add($code, [
+          $translations->push([
+            'lang' => $code,
             'href' => $attr['href'],
             'node' => '/' . ltrim($code . '/' . $page->uri($code), '/') . '/' . $this->model->filename()
           ]);

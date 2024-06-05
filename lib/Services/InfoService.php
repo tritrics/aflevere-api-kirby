@@ -7,6 +7,8 @@ use Kirby\Exception\LogicException;
 use Tritrics\Ahoi\v1\Data\Collection;
 use Tritrics\Ahoi\v1\Helper\ConfigHelper;
 use Tritrics\Ahoi\v1\Helper\LanguagesHelper;
+use Tritrics\Ahoi\v1\Helper\BlueprintHelper;
+use Tritrics\Ahoi\v1\Models\SiteModel;
 use Tritrics\Ahoi\v1\Models\LanguageModel;
 
 /**
@@ -46,23 +48,29 @@ class InfoService
       $interface = $body->add('interface');
       $Request = kirby()->request();
       $url = substr($Request->url()->toString(), 0, -5); // the easy way
+      if (ConfigHelper::isEnabledAction()) {
+        $interface->add('action', $url . '/action');
+      }
+      if (ConfigHelper::isEnabledFile()) {
+        $interface->add('file', $url . '/file');
+      }
+      if (ConfigHelper::isEnabledFiles()) {
+        $interface->add('files', $url . '/files');
+      }
       if (ConfigHelper::isEnabledInfo()) {
         $interface->add('info', $url . '/info',);
       }
       if (ConfigHelper::isEnabledLanguage()) {
         $interface->add('language', $url . '/language',);
       }
-      if (ConfigHelper::isEnabledFields()) {
-        $interface->add('fields', $url . '/fields');
+      if (ConfigHelper::isEnabledPage()) {
+        $interface->add('page', $url . '/page');
       }
       if (ConfigHelper::isEnabledPages()) {
         $interface->add('pages', $url . '/pages');
       }
-      if (ConfigHelper::isEnabledFiles()) {
-        $interface->add('files', $url . '/files');
-      }
-      if (ConfigHelper::isEnabledAction()) {
-        $interface->add('action', $url . '/action');
+      if (ConfigHelper::isEnabledSite()) {
+        $interface->add('site', $url . '/site');
       }
     }
 
@@ -72,6 +80,18 @@ class InfoService
       foreach(LanguagesHelper::getAll() as $model) {
         $languages->push(new LanguageModel($model));
       }
+    }
+
+    // add sites
+    $site = site();
+    $blueprint = BlueprintHelper::get($site);
+    if ($isMultilang) {
+      $sites = $body->add('sites');
+      foreach(LanguagesHelper::getCodes() as $code) {
+        $sites->push(new SiteModel($site, $blueprint, $code, [], false));
+      }
+    } else {
+      $body->add('site', new SiteModel($site, $blueprint, '', [], false));
     }
     return $body;
   }

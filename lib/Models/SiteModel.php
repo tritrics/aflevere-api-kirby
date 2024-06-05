@@ -2,16 +2,15 @@
 
 namespace Tritrics\Ahoi\v1\Models;
 
-use Kirby\Cms\Page;
 use Tritrics\Ahoi\v1\Data\Collection;
 use Tritrics\Ahoi\v1\Helper\LanguagesHelper;
 use Tritrics\Ahoi\v1\Helper\ConfigHelper;
-use Tritrics\Ahoi\v1\Helper\UrlHelper;
+use Tritrics\Ahoi\v1\Helper\BlueprintHelper;
 
 /**
- * Model for Kirby's page object
+ * Model for Kirby's site object
  */
-class PageModel extends BaseModel
+class SiteModel extends BaseModel
 {
   /**
    * Marker if this model has child fields.
@@ -28,22 +27,17 @@ class PageModel extends BaseModel
   /**
    * Get additional field data (besides type and value)
    */
-  protected function getProperties (): Collection
+  protected function getProperties(): Collection
   {
     $res = new Collection();
     $content = $this->model->content($this->lang);
 
     $meta = $res->add('meta');
-    $meta->add('slug', $this->model->slug($this->lang));
-    $meta->add('href', UrlHelper::getPath($this->model->url($this->lang)));
-    $meta->add('node', UrlHelper::getNode($this->model, $this->lang));
+    $meta->add('node', ConfigHelper::isMultilang() ? '/' . $this->lang : '');
     if (ConfigHelper::isMultilang()) {
       $meta->add('lang', $this->lang);
     }
-    $meta->add('blueprint', (string) $this->model->intendedTemplate());
-    $meta->add('status', $this->model->status());
-    $meta->add('sort', (int) $this->model->num());
-    $meta->add('home', $this->model->isHomePage());
+    $meta->add('blueprint', 'site');
     $meta->add('title', $content->title()->value());
     $meta->add('modified',  date('c', $this->model->modified()));
 
@@ -54,14 +48,13 @@ class PageModel extends BaseModel
         foreach (LanguagesHelper::getCodes() as $code) {
           $translations->push([
             'lang' => $code,
-            'href' => UrlHelper::getPath($this->model->url($code)),
-            'node' => '/' . trim($code . '/' . $this->model->uri($code), '/')
+            'node' => '/' . $code
           ]);
         }
         $meta->add('translations', $translations);
       }
     }
-    
+
     if ($this->blueprint->has('api', 'meta')) {
       $api = new Collection();
       foreach ($this->blueprint->node('api', 'meta')->get() as $key => $value) {
@@ -70,6 +63,16 @@ class PageModel extends BaseModel
       if ($api->count() > 0) {
         $meta->add('api', $api);
       }
+    }
+
+    // adding homepage
+    if ($this->addDetails) {
+      $home = $this->model->homePage();
+      $blueprint = BlueprintHelper::get($home);
+      $res->add(
+        'home',
+        new PageModel($home, $blueprint, $this->lang, [], false)
+      );
     }
     return $res;
   }
