@@ -77,16 +77,4 @@ class NodeController
     }
     return $this->get($Response, $lang, $slug);
   }
-
-  /**
-   * Get site
-   */
-  public function site(?string $lang): KirbyResponse
-  {
-    $Response = new Response('site', $lang);
-    if (!ConfigHelper::isEnabledSite()) {
-      return $Response->getDisabled();
-    }
-    return $this->get($Response, $lang, null);
-  }
 }

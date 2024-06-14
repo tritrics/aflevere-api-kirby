@@ -28,31 +28,13 @@ class InfoService
     $isMultilang = ConfigHelper::isMultilang();
     $body = new Collection();
 
-    // languages and analization
-    // langdetect is true, if combination of origin and slug is unique
-    // -> frontend is able to detect the language of a given path
-    $langdetect = true;
-    $urls = [];
-    if ($isMultilang) {
-      $languages = new Collection();
-      foreach (LanguagesHelper::getAll() as $model) {
-        if (in_array($model->url(), $urls)) {
-          $langdetect = false;
-        }
-        $urls[] = $model->url();
-        $languages->push(new LanguageModel($model));
-      }
-    }
-
     // Type
     $body->add('type', 'info');
 
     // Meta
     $meta = $body->add('meta');
     $meta->add('multilang', $isMultilang);
-    if ($isMultilang) {
-      $meta->add('langdetect', $langdetect);
-    }
+    $meta->add('home', '/' . ltrim(kirby()->option('home', 'home'), '/'));
     if ($expose) {
       $meta->add('api', ConfigHelper::getVersion());
       $meta->add('plugin', ConfigHelper::getPluginVersion());
@@ -88,13 +70,14 @@ class InfoService
       if (ConfigHelper::isEnabledPages()) {
         $interface->add('pages', $url . '/pages');
       }
-      if (ConfigHelper::isEnabledSite()) {
-        $interface->add('site', $url . '/site');
-      }
     }
 
     // add languages
     if ($isMultilang) {
+      $languages = new Collection();
+      foreach (LanguagesHelper::getAll() as $model) {
+        $languages->push(new LanguageModel($model));
+      }
       $body->add('languages', $languages);
     }
 

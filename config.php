@@ -28,7 +28,6 @@ kirby()::plugin(ConfigHelper::getPluginName(), [
       'files' => false,
       'page' => false,
       'pages' => false,
-      'site' => false
     ],
     'slug' => 'public-api',
     'field_name_separator' => '_',
@@ -104,19 +103,6 @@ kirby()::plugin(ConfigHelper::getPluginName(), [
         'action' => function ($resource = '') use ($multilang) {
           $controller = new LanguageController();
           return $controller->language($resource);
-        }
-      ];
-    }
-
-    // a site
-    if (ConfigHelper::isEnabledSite()) {
-      $routes[] = [
-        'pattern' => $slug . '/site/(:any?)',
-        'method' => 'GET',
-        'action' => function ($resource = '') use ($multilang) {
-          list($lang) = RequestHelper::parsePath($resource, $multilang);
-          $controller = new NodeController();
-          return $controller->site($lang);
         }
       ];
     }

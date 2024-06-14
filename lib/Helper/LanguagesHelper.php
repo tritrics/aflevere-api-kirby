@@ -108,7 +108,7 @@ class LanguagesHelper
    * Get the (optional) domain, defined in languages/[lang].php > url.
    * Origin is the domain-part of the setting (@see getLinkPrefix()).
    */
-  public static function getOrigin(string $code): string|null
+  public static function getOrigin(string $code): string
   {
     if (self::isValid($code)) {
       $language = self::get($code);
@@ -119,7 +119,7 @@ class LanguagesHelper
         return rtrim(UrlHelper::buildHost($url), '/');
       }
     }
-    return null;
+    return '';
   }
 
   /**

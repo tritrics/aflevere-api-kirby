@@ -150,14 +150,6 @@ class ConfigHelper
   }
 
   /**
-   * Check if "page" action is enabled.
-   */
-  public static function isEnabledSite(): bool
-  {
-    return self::isEnabled('site');
-  }
-
-  /**
    * Check if installation is multilang.
    * Multilang-site is defined in config.php: languages => true.
    */
