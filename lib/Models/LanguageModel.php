@@ -16,16 +16,13 @@ class LanguageModel extends BaseModel
   protected function getProperties(): Collection
   {
     $code = trim(strtolower($this->model->code()));
-    $origin = LanguagesHelper::getOrigin($code);
 
     $res = new Collection();
     $meta = $res->add('meta');
     $meta->add('code', $code);
     $meta->add('title', $this->model->name());
     $meta->add('default', $this->model->isDefault());
-    if ($origin) {
-      $meta->add('origin', $origin);
-    }
+    $meta->add('origin', LanguagesHelper::getOrigin($code));
     $meta->add('slug', LanguagesHelper::getLangSlug($code));
     $meta->add('locale', LanguagesHelper::getLocale($code));
     $meta->add('direction', $this->model->direction());

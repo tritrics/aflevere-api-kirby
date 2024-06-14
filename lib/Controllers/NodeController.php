@@ -30,7 +30,7 @@ class NodeController
   /**
    * Get a file
    */
-  public function file(?string $lang, string $slug): KirbyResponse
+  public function file(?string $lang, ?string $slug): KirbyResponse
   {
     $Response = new Response('site', $lang, $slug);
     if (!ConfigHelper::isEnabledFile()) {
@@ -69,7 +69,7 @@ class NodeController
   /**
    * Get a page
    */
-  public function page(?string $lang, string $slug): KirbyResponse
+  public function page(?string $lang, ?string $slug): KirbyResponse
   {
     $Response = new Response('page', $lang, $slug);
     if (!ConfigHelper::isEnabledPage()) {

@@ -103,10 +103,10 @@ class KirbyHelper
    * Helper: Find a page by translated slug
    * (Kirby can only find by default slug)
    */
-  public static function findPage(?string $lang = null, ?string $slug = null): ?Page
+  public static function findPage(?string $lang = null, ?string $slug = null): Page|Site|null
   {
     if (!is_string($slug)) {
-      return null;
+      return kirby()->site();
     }
     $slug = trim($slug, '/');
 

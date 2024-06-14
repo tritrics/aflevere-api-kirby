@@ -30,7 +30,7 @@ class CollectionController
   /**
    * Get the files of a page, optionally filtered, limited etc.
    */
-  public function files(?string $lang, string $slug): KirbyResponse
+  public function files(?string $lang, ?string $slug): KirbyResponse
   {
     $Response = new Response('files', $lang, $slug);
     if (!ConfigHelper::isEnabledFiles()) {
@@ -74,7 +74,7 @@ class CollectionController
   /**
    * Get the children of a page, optionally filtered, limited etc.
    */
-  public function pages(?string $lang, string $slug): KirbyResponse
+  public function pages(?string $lang, ?string $slug): KirbyResponse
   {
     $Response = new Response('pages', $lang, $slug);
     if (!ConfigHelper::isEnabledPages()) {
