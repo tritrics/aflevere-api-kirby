@@ -242,7 +242,8 @@ class BlueprintHelper
 
       // a fieldgroup, don't add group itself
       if ($def['type'] === 'group' && isset($def['fields'])) {
-        $res = array_merge($res, self::getFieldsRec($def['fields'], $publish));
+        $publishField = self::isPublishedApplied($def, $publish);
+        $res = array_merge($res, self::getFieldsRec($def['fields'], $publishField));
         continue;
       }
 

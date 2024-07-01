@@ -133,9 +133,7 @@ class LinkHelper
       $href = $mixed->url($lang);
       $res = [
         'type' => 'page',
-        'href' => UrlHelper::getPath($href),
-        'node' => UrlHelper::getNode($mixed, $lang),
-        'lang' => $lang
+        'href' => UrlHelper::getPath($href)
       ];
     }
     return self::addGlobals($res, $title, $blank);

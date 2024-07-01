@@ -118,12 +118,14 @@ class TextModel extends BaseModel
 
       // change attributes, if it's a link
       if ($res['elem'] === 'a') {
-        $attr = LinkHelper::get(
+        $meta = LinkHelper::get(
           $attr['href'] ?? null,
           $attr['title'] ??  null,
           (isset($attr['target']) && $attr['target'] === '_blank'),
           $this->lang
         );
+        $attr['href'] = $meta['href'];
+        $res['meta'] = $meta;
       }
       if (count($attr)) {
         $res['attr'] = $attr;
