@@ -80,18 +80,6 @@ class InfoService
       }
       $body->add('languages', $languages);
     }
-
-    // add sites
-    $site = site();
-    $blueprint = BlueprintHelper::get($site);
-    if ($isMultilang) {
-      $sites = $body->add('sites');
-      foreach(LanguagesHelper::getCodes() as $code) {
-        $sites->push(new SiteModel($site, $blueprint, $code, [], false));
-      }
-    } else {
-      $body->add('site', new SiteModel($site, $blueprint, '', [], false));
-    }
     return $body;
   }
 }

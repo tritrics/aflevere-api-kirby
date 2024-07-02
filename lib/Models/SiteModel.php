@@ -30,31 +30,20 @@ class SiteModel extends BaseModel
   protected function getProperties(): Collection
   {
     $res = new Collection();
-    $content = $this->model->content($this->lang);
-
     $meta = $res->add('meta');
+
+    // global values
+    $meta->add('blueprint', 'site');
+    $meta->add('modified',  date('c', $this->model->modified()));
     $meta->add('node', ConfigHelper::isMultilang() ? '/' . $this->lang : '');
+    $meta->add('title', $this->model->content($this->lang)->title()->value());
+
+    // language specific
     if (ConfigHelper::isMultilang()) {
       $meta->add('lang', $this->lang);
     }
-    $meta->add('blueprint', 'site');
-    $meta->add('title', $content->title()->value());
-    $meta->add('modified',  date('c', $this->model->modified()));
 
-      // adding translations
-    if (ConfigHelper::isMultilang()) {
-      if ($this->addDetails) {
-        $translations = new Collection();
-        foreach (LanguagesHelper::getCodes() as $code) {
-          $translations->push([
-            'lang' => $code,
-            'node' => '/' . $code
-          ]);
-        }
-        $meta->add('translations', $translations);
-      }
-    }
-
+    // optional api meta values
     if ($this->blueprint->has('api', 'meta')) {
       $api = new Collection();
       foreach ($this->blueprint->node('api', 'meta')->get() as $key => $value) {
@@ -64,16 +53,17 @@ class SiteModel extends BaseModel
         $meta->add('api', $api);
       }
     }
-
+    
     // adding homepage
     if ($this->addDetails) {
       $home = $this->model->homePage();
       $blueprint = BlueprintHelper::get($home);
       $res->add(
         'home',
-        new PageModel($home, $blueprint, $this->lang, [], false)
+        new PageModel($home, $blueprint, $this->lang, [], true)
       );
     }
+
     return $res;
   }
 

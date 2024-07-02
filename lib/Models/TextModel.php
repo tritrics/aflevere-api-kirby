@@ -124,8 +124,17 @@ class TextModel extends BaseModel
           (isset($attr['target']) && $attr['target'] === '_blank'),
           $this->lang
         );
-        $attr['href'] = $meta['href'];
-        $res['meta'] = $meta;
+        if (is_array($meta) && isset($meta['href'])) {
+          $res['meta'] = $meta;
+          $attr['href'] = $meta['href'];
+        } else {
+
+          // invalid link, so return text node
+          $attr = [];
+          $res = [
+            'value' => $res['value']
+          ];
+        }
       }
       if (count($attr)) {
         $res['attr'] = $attr;
