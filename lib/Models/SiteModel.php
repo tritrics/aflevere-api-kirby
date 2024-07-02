@@ -3,7 +3,7 @@
 namespace Tritrics\Ahoi\v1\Models;
 
 use Tritrics\Ahoi\v1\Data\Collection;
-use Tritrics\Ahoi\v1\Helper\LanguagesHelper;
+use Tritrics\Ahoi\v1\Helper\UrlHelper;
 use Tritrics\Ahoi\v1\Helper\ConfigHelper;
 use Tritrics\Ahoi\v1\Helper\BlueprintHelper;
 
@@ -36,6 +36,8 @@ class SiteModel extends BaseModel
     $meta->add('blueprint', 'site');
     $meta->add('modified',  date('c', $this->model->modified()));
     $meta->add('node', ConfigHelper::isMultilang() ? '/' . $this->lang : '');
+    // avoid redundand data, take home-slug from infoService and current langslug
+    // $meta->add('home', UrlHelper::getNode($this->model->homePage(), $this->lang));
     $meta->add('title', $this->model->content($this->lang)->title()->value());
 
     // language specific
@@ -52,16 +54,6 @@ class SiteModel extends BaseModel
       if ($api->count() > 0) {
         $meta->add('api', $api);
       }
-    }
-    
-    // adding homepage
-    if ($this->addDetails) {
-      $home = $this->model->homePage();
-      $blueprint = BlueprintHelper::get($home);
-      $res->add(
-        'home',
-        new PageModel($home, $blueprint, $this->lang, [], true)
-      );
     }
 
     return $res;

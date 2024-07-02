@@ -34,7 +34,7 @@ class InfoService
     // Meta
     $meta = $body->add('meta');
     $meta->add('multilang', $isMultilang);
-    $meta->add('home', '/' . ltrim(kirby()->option('home', 'home'), '/'));
+    $meta->add('home', trim(kirby()->option('home', 'home'), '/'));
     if ($expose) {
       $meta->add('api', ConfigHelper::getVersion());
       $meta->add('plugin', ConfigHelper::getPluginVersion());
